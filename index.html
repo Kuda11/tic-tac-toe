@@ -3,10 +3,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic-Tac-Toe</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    
+    <div class="game-board" id="gameBoard">
+        <div class="tick-box simbol-X" data-box></div>
+        <div class="tick-box" data-box></div>
+        <div class="tick-box" data-box></div>
+        <div class="tick-box" data-box></div>
+        <div class="tick-box" data-box></div>
+        <div class="tick-box" data-box></div>
+        <div class="tick-box" data-box></div>
+        <div class="tick-box" data-box></div>
+        <div class="tick-box" data-box></div>
+    </div>
+    <div class="user-result-message" id="userResultMessage">
+        <div data-user-result-message></div>
+        <button id="restartButton">Play Again!</button>
+        <button>Quit Gmae</button>
+    </div>
 </body>
 <script src="./assets/scripts/main.js"></script>
 </html>
