@@ -3,7 +3,7 @@
   }
   :root {
       --box-size: 100px;
-      --dash-size: calc(var(--cell-size) * 0.9);
+      --dash-size: calc(var(--box-size) * 0.9);
   }
 
   body {
@@ -29,6 +29,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      position: relative;
+      cursor: pointer;
   }
 
   .tick-box:first-child, .tick-box:nth-child(2), .tick-box:nth-child(3) {
@@ -47,10 +49,81 @@
     border-right: none;
 }
 
-.tick-box.simbol-X::before,
-.tick-box.simbol-X::after {
+.tick-box.X::before,
+.tick-box.X::after {
     content: '';
     position: absolute;
-    width: calc(var(--mark-size) * .15);
-    height: var(--mark-size);
+    width: calc(var(--dash-size) * .15);
+    height: var(--dash-size);
+    background-color: black;
+}
+
+.tick-box.X::before {
+    transform: rotate(45deg);
+}
+
+.tick-box.X::after {
+    transform: rotate(-45deg);
+}
+
+
+.tick-box.circle::before,
+.tick-box.circle::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background-color: black;
+}
+
+.tick-box.circle::before {
+    height: var(--dash-size);
+    width: var(--dash-size);
+    background-color: black;
+}
+
+.tick-box.circle::after {
+    height: calc(var(--dash-size) * .7);
+    width: calc(var(--dash-size) * .7);
+    background-color: white;
+}
+
+.user-result-message {
+    display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    color: white;
+    flex-direction: column;
+    font-size: 3rem;
+}
+
+.user-result-message button:nth-child(2) {
+    margin-top: 100px;
+}
+
+.user-result-message button {
+    font-size: 2rem;
+    background-color: royalblue;
+    border: 1px solid black;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    margin: 15px;
+}
+
+
+.user-result-message button:hover {
+    background-color: white;
+    color: royalblue;
+    border: 1px solid black;
+} 
+
+.user-result-message.display {
+    display: flex;
 }
