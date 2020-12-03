@@ -1,0 +1,56 @@
+*, *::after, *::before {
+    box-sizing: border-box;
+  }
+  :root {
+      --box-size: 100px;
+      --dash-size: calc(var(--cell-size) * 0.9);
+  }
+
+  body {
+      margin: 0;
+      padding: 0;
+  }
+
+  .game-board {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      justify-content: center;
+      justify-items: center;
+      align-items: center;
+      align-content: center;
+  }
+
+  .tick-box {
+      width: var(--box-size);
+      height: var(--box-size);
+      border: 3px solid black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .tick-box:first-child, .tick-box:nth-child(2), .tick-box:nth-child(3) {
+      border-top: none;
+  }
+  
+  .tick-box:nth-child(7), .tick-box:nth-child(8), .tick-box:nth-child(9) {
+      border-bottom: none;
+  }
+
+  .tick-box:first-child, .tick-box:nth-child(4), .tick-box:nth-child(7) {
+      border-left: none;
+  }
+
+  .tick-box:nth-child(3), .tick-box:nth-child(6), .tick-box:nth-child(9) {
+    border-right: none;
+}
+
+.tick-box.simbol-X::before,
+.tick-box.simbol-X::after {
+    content: '';
+    position: absolute;
+    width: calc(var(--mark-size) * .15);
+    height: var(--mark-size);
+}
