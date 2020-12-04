@@ -1,4 +1,5 @@
 import { checkWin } from './game-functionality.js'
+import { botController } from './computer-brain.js'
 
 const X_SYMBOL_CLASS = 'x'
 const O_SYMBOL_CLASS = 'circle'
@@ -29,11 +30,23 @@ function restartGame() {
 }
 
 function handleClick(e) {
+    const markedGameBoardSpaces = {};
+
     const box = e.target;
     const currentClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
 
     // You
     displaySymbol(box, currentClass)
+
+    const playerSpotsMarked = [...tickBoxes].filter(tickBox => {
+        return tickBox.classList.contains(currentClass)
+    })
+
+    markedGameBoardSpaces['playerSpotsMarked'] = playerSpotsMarked;
+
+    if (checkWin(currentClass)) {
+        return endGame(false, currentClass)
+    }
 
     // Bot
     const boxesLeft = [...tickBoxes].filter(tickBox => {
@@ -42,22 +55,26 @@ function handleClick(e) {
 
     const boxIds = boxesLeft.map(box => {
         return {
-            // box is equal to document.getElementById(box)
             element: box,
             id: box.id
         }
     })
 
-    if (checkWin(currentClass)) {
-        return endGame(false, currentClass)
-    }
-
     if (boxesLeft.length) {
         changePlayerTurn()
         const botClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
+
         const randomBox = boxIds[Math.floor(Math.random() * boxesLeft.length)];
         randomBox.element.removeEventListener('click', handleClick, { once: true })
         displaySymbol(randomBox.element, botClass);
+
+        const botSpotsMarked = [...tickBoxes].filter(tickBox => {
+            return tickBox.classList.contains(botClass)
+        })
+
+        markedGameBoardSpaces['botSpotsMarked'] = botSpotsMarked;
+
+        botController(markedGameBoardSpaces)
 
         if(checkWin(botClass)) {
             return endGame(false, botClass)
