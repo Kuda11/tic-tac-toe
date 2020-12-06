@@ -10,6 +10,8 @@ const DisplayWinningText = document.getElementById('userResultMessage')
 let circleTurn = randomisePlayerTurn()
 const restartBtn = document.getElementById('restartBtn')
 restartBtn.addEventListener('click', restartGame)
+var waitTurn = false;
+
 
 function randomisePlayerTurn() {
     return Math.random() > 0.5 ? true : false;
@@ -30,6 +32,7 @@ function restartGame() {
 }
 
 function handleClick(e) {   
+    if(waitTurn) return;
     const markedGameBoardSpaces = {};
 
     const box = e.target;
@@ -49,6 +52,8 @@ function handleClick(e) {
     }
 
     // Bot
+    waitTurn = true;
+
     const boxesLeft = [...tickBoxes].filter(tickBox => {
         return !(tickBox.classList.contains(O_SYMBOL_CLASS) || tickBox.classList.contains(X_SYMBOL_CLASS))
     });
@@ -72,12 +77,17 @@ function handleClick(e) {
 
         markedGameBoardSpaces['botSpotsMarked'] = botSpotsMarked;
 
-        botController(markedGameBoardSpaces, currentClass, displaySymbol, botClass, handleClick, randomBox);
+        const delayBot = setTimeout(() => {
+            botController(markedGameBoardSpaces, currentClass, displaySymbol, botClass, handleClick, randomBox);
+            clearInterval(delayBot);
 
-        if(checkWin(botClass)) {
-            return endGame(false, botClass)
-        }
+            if(checkWin(botClass)) {
+                return endGame(false, botClass)
+            }
+        }, 200);
     }
+
+    waitTurn = false;
 
     if (isDraw()){
         endGame(true)
