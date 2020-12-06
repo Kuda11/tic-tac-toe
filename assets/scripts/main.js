@@ -29,7 +29,7 @@ function restartGame() {
     })
 }
 
-function handleClick(e) {
+function handleClick(e) {   
     const markedGameBoardSpaces = {};
 
     const box = e.target;
@@ -65,8 +65,6 @@ function handleClick(e) {
         const botClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
 
         const randomBox = boxIds[Math.floor(Math.random() * boxesLeft.length)];
-        randomBox.element.removeEventListener('click', handleClick, { once: true })
-        displaySymbol(randomBox.element, botClass);
 
         const botSpotsMarked = [...tickBoxes].filter(tickBox => {
             return tickBox.classList.contains(botClass)
@@ -74,7 +72,7 @@ function handleClick(e) {
 
         markedGameBoardSpaces['botSpotsMarked'] = botSpotsMarked;
 
-        botController(markedGameBoardSpaces)
+        botController(markedGameBoardSpaces, currentClass, displaySymbol, botClass, handleClick, randomBox);
 
         if(checkWin(botClass)) {
             return endGame(false, botClass)
@@ -110,4 +108,4 @@ function isDraw() {
         return box.classList.contains(O_SYMBOL_CLASS) ||
         box.classList.contains(X_SYMBOL_CLASS)
     })
-}
+}  

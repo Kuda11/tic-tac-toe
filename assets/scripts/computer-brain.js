@@ -1,33 +1,101 @@
-import { winningComboData } from './data.js'
+import { winningComboData } from "./data.js";
 
-export function botController(spotsMarked) {
-    console.log('hello', 'YEAHSADA🔥')
-    console.log(spotsMarked)
-}
+const state = {
+  player: "",
+  displayCounterComputerSymbol: undefined,
+  botCharacterClass: "",
+  handleClick: undefined,
+};
 
-/*
-function - stop playing from winning {
-    check player's position and see if he is 1 match away from winning
-    if they are
-    check if the posistion is empty 
-    if ture
-    take the position of winning player spot
-    else if 
-    check remaining combination and repeat previous checks
+export function botController(
+  spotsMarked,
+  playerCharacterClass,
+  displayCounterComputerSymbol,
+  botCharacterClass,
+  eventListener,
+  randomBox
+) {
+  state.player = playerCharacterClass;
+  state.botCharacterClass = botCharacterClass;
+  state.displayCounterComputerSymbol = displayCounterComputerSymbol;
+  state.handleClick = eventListener;
+
+  if (playToWin(spotsMarked)) {
     return;
+  } else if (stopPlayerFromWinning(spotsMarked)) {
+    return;
+  } else {
+    playRandom(randomBox.element);
+  }
 }
-    function - trying to win {
-        find the positions the bot has taken
-        if no position taken
-        take a random spot
-        else 
-        find a possible matching combination with the bots position
-        check the positions are empty (import function)
-        place position at any one of the combination spots
-        return;
-    }
 
-function - helper function for comparing combination with two positions (postions can be bot or player)
-function - stop playing from winning
-function - trying to win
-*/ 
+function stopPlayerFromWinning({ playerSpotsMarked }) {
+  return decideHowToPlay(playerSpotsMarked);
+}
+
+function playToWin({ botSpotsMarked }) {
+  return decideHowToPlay(botSpotsMarked);
+}
+
+function decideHowToPlay(spotsMarked) {
+  // Security check. Tells us if a combination has been found
+  if (spotsMarked.length >= 2) {
+    let combinationFound = false;
+    // Loop through each position and find each possible permutation for a combination
+    // E.g. for an array of [1,3,5]
+    // Check for combination of [1,3] [1,5] [3,5]
+    for (let i = 0, length = spotsMarked.length; i < length; i++) {
+      for (let j = i; j < length - 1; j++) {
+        // If a combination has been found, break out the loop
+        if (combinationFound) break;
+        const combination = [spotsMarked[i], spotsMarked[j + 1]];
+        if (checkCombination(combination)) {
+          // Lets us know a combination has been found
+          combinationFound = true;
+        }
+      }
+    }
+    return combinationFound;
+  }
+  return false;
+}
+
+function playRandom(box) {
+  state.displayCounterComputerSymbol(box, state.botCharacterClass);
+  box.removeEventListener("click", state.handleClick, { once: true });
+}
+
+function checkCombination(playerSpots) {
+  const playerWinnerCombo = winningComboData.find((winningCombo) => {
+    const matchingSpots = playerSpots.filter((playerSpot) =>
+      winningCombo.includes(parseInt(playerSpot.id))
+    );
+    return matchingSpots.length == 2;
+  });
+
+  if (playerWinnerCombo && checkEmptyPositions(playerWinnerCombo)) {
+    const emptyPosition = playerWinnerCombo.find(
+      (position) => document.getElementById(position).className === "tick-box"
+    );
+
+    if (emptyPosition >= 0 || emptyPosition < 9) {
+      const emptyPositionOnGameBoard = document.getElementById(emptyPosition);
+      emptyPositionOnGameBoard.removeEventListener("click", state.handleClick, {
+        once: true,
+      });
+      state.displayCounterComputerSymbol(
+        emptyPositionOnGameBoard,
+        state.botCharacterClass
+      );
+      return true;
+    }
+  }
+}
+
+function checkEmptyPositions(playerWinnerCombo) {
+  // Box has not been filled yet
+  return playerWinnerCombo.some(
+    (singlePosition) =>
+      document.getElementById(singlePosition).className === "tick-box"
+  );
+}
