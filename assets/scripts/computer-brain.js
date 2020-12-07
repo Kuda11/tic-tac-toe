@@ -4,21 +4,24 @@ const state = {
   player: "",
   displayCounterComputerSymbol: undefined,
   botCharacterClass: "",
-  handleClick: undefined,
+  handleKeyDown: undefined,
 };
 
-export function botController(
-  spotsMarked,
-  playerCharacterClass,
-  displayCounterComputerSymbol,
+export function botController({
+  spotsMarked = {
+    playerSpotsMarked: [],
+    botSpotsMarked: [],
+  },
+  currentClass,
+  displaySymbol,
   botCharacterClass,
-  eventListener,
-  randomBox
-) {
-  state.player = playerCharacterClass;
+  handleKeyDown,
+  randomBox,
+} = {}) {
+  state.player = currentClass;
   state.botCharacterClass = botCharacterClass;
-  state.displayCounterComputerSymbol = displayCounterComputerSymbol;
-  state.handleClick = eventListener;
+  state.displayCounterComputerSymbol = displaySymbol;
+  state.handleKeyDown = handleKeyDown;
 
   if (playToWin(spotsMarked)) {
     return;
@@ -38,19 +41,15 @@ function playToWin({ botSpotsMarked }) {
 }
 
 function decideHowToPlay(spotsMarked) {
-  // Security check. Tells us if a combination has been found
   if (spotsMarked.length >= 2) {
     let combinationFound = false;
-    // Loop through each position and find each possible permutation for a combination
-    // E.g. for an array of [1,3,5]
-    // Check for combination of [1,3] [1,5] [3,5]
+
     for (let i = 0, length = spotsMarked.length; i < length; i++) {
       for (let j = i; j < length - 1; j++) {
-        // If a combination has been found, break out the loop
         if (combinationFound) break;
+
         const combination = [spotsMarked[i], spotsMarked[j + 1]];
         if (checkCombination(combination)) {
-          // Lets us know a combination has been found
           combinationFound = true;
         }
       }
@@ -62,7 +61,7 @@ function decideHowToPlay(spotsMarked) {
 
 function playRandom(box) {
   state.displayCounterComputerSymbol(box, state.botCharacterClass);
-  box.removeEventListener("click", state.handleClick, { once: true });
+  box.removeEventListener("click", state.handleKeyDown);
 }
 
 function checkCombination(playerSpots) {
@@ -80,9 +79,7 @@ function checkCombination(playerSpots) {
 
     if (emptyPosition >= 0 || emptyPosition < 9) {
       const emptyPositionOnGameBoard = document.getElementById(emptyPosition);
-      emptyPositionOnGameBoard.removeEventListener("click", state.handleClick, {
-        once: true,
-      });
+      emptyPositionOnGameBoard.removeEventListener("click", state.handleKeyDown);
       state.displayCounterComputerSymbol(
         emptyPositionOnGameBoard,
         state.botCharacterClass
@@ -93,7 +90,6 @@ function checkCombination(playerSpots) {
 }
 
 function checkEmptyPositions(playerWinnerCombo) {
-  // Box has not been filled yet
   return playerWinnerCombo.some(
     (singlePosition) =>
       document.getElementById(singlePosition).className === "tick-box"
