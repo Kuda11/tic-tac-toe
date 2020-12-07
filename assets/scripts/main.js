@@ -49,7 +49,12 @@ function userStartGame() {
 }
 
 function restartGame() {
-  requestAds();
+    // Ads to run after game has finished e.g. you draw, win or lose
+    // Need to fix it, so it runs the ads properly
+    // Need to be able to hide everything else and cause the div with mainAdContainer to show
+    // Need to have it autoplay eventually as well
+
+//   requestAds();
 
   DisplayWinningText.classList.remove("display");
   waitTurn = false;
