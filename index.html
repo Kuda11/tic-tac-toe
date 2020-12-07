@@ -1,12 +1,32 @@
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tic-Tac-Toe</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-      <h1 class="title"><span class="title-red">Tic</span> <span class="title-blue">Tac</span> <span class="title-green">Toe</span></h1>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="mainAdContainer">
+    <div id="mainContainer">
+      <div id="content">
+        <video id="contentElement"></video>
+      </div>
+      <div id="adContainer"></div>
+    </div>
+    <div class="adButton">
+      <button id="playButton">Play Ad</button>
+      <div id="countdownUi"></div>
+    </div>
+  </div>
+
+  <main class="game-screen">
+    <h1 class="title"><span class="title-red">Tic</span> <span class="title-blue">Tac</span> <span
+      class="title-green">Toe</span></h1>
+
+    <div class="player-turn-message" data-user-turn-message></div>
     <div class="game-board" id="gameBoard">
       <div class="tick-box" data-box id="0"></div>
       <div class="tick-box" data-box id="1"></div>
@@ -18,12 +38,24 @@
       <div class="tick-box" data-box id="7"></div>
       <div class="tick-box" data-box id="8"></div>
     </div>
-    <div class="user-result-message" id="userResultMessage">
-      <div data-user-result-message></div>
-      <button id="restartBtn">Play Again!</button>
-      <button ><a href="https://play.google.com/store/apps/details?id=com.king.candycrushsaga&hl=en_GB&gl=US">Quit Game</a></button>
+    <div class="user-start-message" id="userStartGameMessage">
+      <h3>Lets Play Tic-Tac-Toe</h3>
+      <button id="userStartGameBtn">Play Game</button>
+      <button><a href="https://play.google.com/store/apps/details?id=com.king.candycrushsaga&hl=en_GB&gl=US">Quit
+          Game</a></button>
     </div>
-  </body>
-  <script src="./assets/scripts/main.js" type="module"></script>
-  <script src="./assets/scripts/computer-brain.js" type="module"></script>
+
+    <div class="user-result-message" id="userResultMessage">
+      <h3 data-user-result-message></h3>
+      <button id="restartBtn">Play Again!</button>
+      <button><a href="https://play.google.com/store/apps/details?id=com.king.candycrushsaga&hl=en_GB&gl=US">Quit
+          Game</a></button>
+    </div>
+  </main>
+</body>
+<script type="text/javascript" src="//imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+<script src="./assets/scripts/ads.js" type="module"></script>
+<script src="./assets/scripts/main.js" type="module"></script>
+<script src="./assets/scripts/computer-brain.js" type="module"></script>
+
 </html>

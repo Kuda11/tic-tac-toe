@@ -7,18 +7,22 @@ const state = {
   handleClick: undefined,
 };
 
-export function botController(
-  spotsMarked,
-  playerCharacterClass,
-  displayCounterComputerSymbol,
+export function botController({
+  spotsMarked = {
+    playerSpotsMarked: [],
+    botSpotsMarked: []
+  },
+  currentClass,
+  displaySymbol,
   botCharacterClass,
-  eventListener,
+  handleClick,
   randomBox
+  } = {}
 ) {
-  state.player = playerCharacterClass;
+  state.player = currentClass;
   state.botCharacterClass = botCharacterClass;
-  state.displayCounterComputerSymbol = displayCounterComputerSymbol;
-  state.handleClick = eventListener;
+  state.displayCounterComputerSymbol = displaySymbol;
+  state.handleClick = handleClick;
 
   if (playToWin(spotsMarked)) {
     return;
@@ -62,7 +66,7 @@ function decideHowToPlay(spotsMarked) {
 
 function playRandom(box) {
   state.displayCounterComputerSymbol(box, state.botCharacterClass);
-  box.removeEventListener("click", state.handleClick, { once: true });
+  box.removeEventListener("click", state.handleClick);
 }
 
 function checkCombination(playerSpots) {
@@ -80,9 +84,7 @@ function checkCombination(playerSpots) {
 
     if (emptyPosition >= 0 || emptyPosition < 9) {
       const emptyPositionOnGameBoard = document.getElementById(emptyPosition);
-      emptyPositionOnGameBoard.removeEventListener("click", state.handleClick, {
-        once: true,
-      });
+      emptyPositionOnGameBoard.removeEventListener("click", state.handleClick);
       state.displayCounterComputerSymbol(
         emptyPositionOnGameBoard,
         state.botCharacterClass
