@@ -17,7 +17,6 @@ function init() {
   videoContent = document.getElementById('contentElement');
   playButton = document.getElementById('playButton');
   countdownUi = document.getElementById('countdownUi');
-  playButton.addEventListener('click', requestAds);
 }
 
 function createAdDisplayContainer() {

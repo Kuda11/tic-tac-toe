@@ -16,10 +16,6 @@
       </div>
       <div id="adContainer"></div>
     </div>
-    <div class="adButton">
-      <button id="playButton">Play Ad</button>
-      <div id="countdownUi"></div>
-    </div>
   </div>
 
   <main class="game-screen">
@@ -28,27 +24,27 @@
 
     <div class="player-turn-message" data-user-turn-message></div>
     <div class="game-board" id="gameBoard">
-      <div class="tick-box" data-box id="0" tabindex="0"></div>
-      <div class="tick-box" data-box id="1" tabindex="0"></div>
-      <div class="tick-box" data-box id="2" tabindex="0"></div>
-      <div class="tick-box" data-box id="3" tabindex="0"></div>
-      <div class="tick-box" data-box id="4" tabindex="0"></div>
-      <div class="tick-box" data-box id="5" tabindex="0"></div>
-      <div class="tick-box" data-box id="6" tabindex="0"></div>
-      <div class="tick-box" data-box id="7" tabindex="0"></div>
-      <div class="tick-box" data-box id="8" tabindex="0"></div>
+      <div class="tick-box highlight" data-box id="0" tabindex="-1"></div>
+      <div class="tick-box" data-box id="1" tabindex="-1"></div>
+      <div class="tick-box" data-box id="2" tabindex="-1"></div>
+      <div class="tick-box" data-box id="3" tabindex="-1"></div>
+      <div class="tick-box" data-box id="4" tabindex="-1"></div>
+      <div class="tick-box" data-box id="5" tabindex="-1"></div>
+      <div class="tick-box" data-box id="6" tabindex="-1"></div>
+      <div class="tick-box" data-box id="7" tabindex="-1"></div>
+      <div class="tick-box" data-box id="8" tabindex="-1"></div>
     </div>
     <div class="user-start-message" id="userStartGameMessage">
       <h3>Lets Play Tic-Tac-Toe</h3>
-      <button id="userStartGameBtn">Play Game</button>
-      <button><a href="https://play.google.com/store/apps/details?id=com.king.candycrushsaga&hl=en_GB&gl=US">Quit
+      <button id="userStartGameBtn">Press Enter to Play Game</button>
+      <button id="leaveGameBtn"><a class="leaveLink" href="https://play.google.com/store/apps/details?id=com.king.candycrushsaga&hl=en_GB&gl=US">Press Backspace Quit
           Game</a></button>
     </div>
 
     <div class="user-result-message" id="userResultMessage">
       <h3 data-user-result-message></h3>
       <button id="restartBtn">Play Again!</button>
-      <button><a href="https://play.google.com/store/apps/details?id=com.king.candycrushsaga&hl=en_GB&gl=US">Quit
+      <button id="leaveGameBtn"><a class="leaveLink" href="https://play.google.com/store/apps/details?id=com.king.candycrushsaga&hl=en_GB&gl=US">Quit
           Game</a></button>
     </div>
   </main>

@@ -61,6 +61,10 @@ body {
   cursor: pointer;
 }
 
+.highlight{
+  background: lightblue;
+}
+
 .tick-box:first-child,
 .tick-box:nth-child(2),
 .tick-box:nth-child(3) {
@@ -177,10 +181,4 @@ a {
 }
 .user-result-message.display {
   display: flex;
-}
-
-.adButton {
-  height: auto;
-  position: absolute;
-  top: 90%;
 }

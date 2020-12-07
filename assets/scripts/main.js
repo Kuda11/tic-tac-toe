@@ -12,8 +12,11 @@ const DisplayWinningText = document.getElementById("userResultMessage");
 let circleTurn = randomisePlayerTurn();
 const userStartGameBtn = document.getElementById("userStartGameBtn");
 const restartBtn = document.getElementById("restartBtn");
+const leaveGameBtn = document.getElementById("leaveGameBtn");
 const userTurnMessage = document.querySelector("[data-user-turn-message]");
+const leaveLink = document.querySelector(".leaveLink");
 const gameScreen = document.querySelector(".game-screen");
+const mainAdContainer = document.querySelector('.mainAdContainer');
 
 userStartGameBtn.addEventListener("click", userStartGame);
 restartBtn.addEventListener("click", restartGame);
@@ -24,7 +27,7 @@ function randomisePlayerTurn() {
 }
 
 tickBoxes.forEach((box) => {
-  box.addEventListener("click", handleClick);
+  box.addEventListener("keydown", handleClick);
 });
 
 showWhoIsPlaying();
@@ -57,81 +60,124 @@ function restartGame() {
 //   requestAds();
 
   DisplayWinningText.classList.remove("display");
+
   waitTurn = false;
   tickBoxes.forEach((box) => {
     box.classList.remove(O_SYMBOL_CLASS);
     box.classList.remove(X_SYMBOL_CLASS);
-    box.addEventListener("click", handleClick);
-    showWhoIsPlaying();
-    randomisePlayerTurn();
   });
+  showWhoIsPlaying();
+  randomisePlayerTurn();
 }
 
+document.body.addEventListener('keydown', handleClick)
+
 function handleClick(e) {
+  const welcomeScreen = document.querySelector('.user-start-message.display');
+  const playAgainScreen = document.querySelector(".user-result-message.display");
+
+  if(!welcomeScreen) {
+    if(convertKeyToMovePosition(e.keyCode) === 'enter') {
+      userStartGame();
+      requestAds();
+      return;
+    }
+    if(convertKeyToMovePosition(e.keyCode) === 'backspace') {
+      window.location = leaveLink.href
+      return;
+    }
+  }
+
+  if(playAgainScreen) {
+    if(convertKeyToMovePosition(e.keyCode) === 'enter') {
+      restartGame();
+      requestAds();
+      return;
+    }
+    if(convertKeyToMovePosition(e.keyCode) === 'backspace') {
+      window.location = leaveLink.href
+      return;
+    }
+  }
+  
   if (waitTurn) return;
-  e.target.removeEventListener("click", handleClick);
-  const spotsMarked = {};
+    const spotsMarked = {};
 
-  const box = e.target;
-  const currentClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
+    const movePosition = convertKeyToMovePosition(e.keyCode);
+    
+    const box = document.querySelector('.highlight')
+    const currentClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
 
-  // User
-  displaySymbol(box, currentClass);
+    const spotToMoveTo = movePlayer(box, movePosition)
 
-  showWhoIsPlaying("Computer");
+    if(!spotToMoveTo) return;
 
-  const playerSpotsMarked = [...tickBoxes].filter((tickBox) => {
-    return tickBox.classList.contains(currentClass);
-  });
-
-  spotsMarked["playerSpotsMarked"] = playerSpotsMarked;
-
-  if (checkWin(currentClass)) {
-    return endGame(false, {
-      user: "PLAYER",
-    });
-  }
-
-  if (isDraw()) {
-    return endGame(true);
-  } else {
-    // Bot
-    waitTurn = true;
-
-    changePlayerTurn();
-    const botCharacterClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
-
-    const botSpotsMarked = [...tickBoxes].filter((tickBox) => {
-      return tickBox.classList.contains(botCharacterClass);
-    });
-
-    spotsMarked["botSpotsMarked"] = botSpotsMarked;
-
-    const botGameInfo = {
-      spotsMarked,
-      currentClass,
-      displaySymbol,
-      botCharacterClass,
-      handleClick,
-      randomBox: findRandomEmptyBox(),
-    };
-
-    const delayBot = setTimeout(() => {
-      runBotController(botGameInfo);
-      showWhoIsPlaying();
-      clearInterval(delayBot);
-
-      if (checkWin(botCharacterClass)) {
-        return endGame(false, {
-          user: "COMPUTER",
-        });
+    if (e.keyCode === 13) {
+      if(!(spotToMoveTo.classList.contains(O_SYMBOL_CLASS) || spotToMoveTo.classList.contains(X_SYMBOL_CLASS))) {
+        displaySymbol(spotToMoveTo, currentClass);
       } else {
-        waitTurn = false;
+        return;
       }
-    }, 1000);
-
-    changePlayerTurn();
-  }
+    } else {
+      return;
+    }
+  
+    // User
+  
+    showWhoIsPlaying("Computer");
+  
+    const playerSpotsMarked = [...tickBoxes].filter((tickBox) => {
+      return tickBox.classList.contains(currentClass);
+    });
+  
+    spotsMarked["playerSpotsMarked"] = playerSpotsMarked;
+  
+    if (checkWin(currentClass)) {
+      return endGame(false, {
+        user: "PLAYER",
+      });
+    }
+  
+    if (isDraw()) {
+      return endGame(true);
+    } else {
+      // Bot
+      waitTurn = true;
+  
+      changePlayerTurn();
+      const botCharacterClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
+  
+      const botSpotsMarked = [...tickBoxes].filter((tickBox) => {
+        return tickBox.classList.contains(botCharacterClass);
+      });
+  
+      spotsMarked["botSpotsMarked"] = botSpotsMarked;
+  
+      const botGameInfo = {
+        spotsMarked,
+        currentClass,
+        displaySymbol,
+        botCharacterClass,
+        handleClick,
+        randomBox: findRandomEmptyBox(),
+      };
+  
+      const delayBot = setTimeout(() => {
+        runBotController(botGameInfo);
+        showWhoIsPlaying();
+        clearInterval(delayBot);
+  
+        if (checkWin(botCharacterClass)) {
+          return endGame(false, {
+            user: "COMPUTER",
+          });
+        } else {
+          waitTurn = false;
+        }
+      }, 1000);
+  
+      changePlayerTurn();
+    }
 }
 
 function displaySymbol(box, currentClass) {
@@ -184,4 +230,50 @@ function findRandomEmptyBox() {
 
 function runBotController(botGameInfo) {
   botController(botGameInfo);
+}
+
+function convertKeyToMovePosition(keyCode) {
+  switch(keyCode) {
+    case 37:
+      return 'left';
+    case 38:
+      return 'up';
+    case 39:
+      return 'right';
+    case 40:
+      return 'down';
+    case 13:
+      return 'enter';
+    case 8:
+      return 'backspace';
+  }
+}
+
+function movePlayer(currentPosition, desiredMove) {
+  const currentPositionID = currentPosition.id;
+  let spaceToMoveBy = 0;
+  switch(desiredMove) {
+    case 'up':
+      spaceToMoveBy -= 3;
+      break;
+    case 'right':
+      spaceToMoveBy += 1;
+      break;
+    case 'down':
+      spaceToMoveBy += 3;
+      break;
+    case 'left':
+      spaceToMoveBy -= 1;
+      break;
+  }
+
+  const newPosition = parseInt(currentPositionID) + spaceToMoveBy;
+  if(newPosition < 0 || newPosition > 8) {
+    return true;
+  } 
+  const newSpot = document.getElementById(newPosition);
+
+  currentPosition.classList.remove('highlight');
+  newSpot.classList.add('highlight');
+  return newSpot
 }
