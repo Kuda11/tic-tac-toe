@@ -128,32 +128,14 @@ function onAdEvent(adEvent) {
       // This event indicates the ad has started - the video player
       // can adjust the UI, for example display a pause button and
       // remaining time.
-      console.log('STARTED 1')
-      if (ad.isLinear()) {
-        console.log('STARTED 2')
-        // For a linear ad, a timer can be started to poll for
-        // the remaining time.
-        intervalTimer = setInterval(
-            function() {
-              var remainingTime = adsManager.getRemainingTime();
-              countdownUi.innerHTML =
-                'Remaining Time: ' + parseInt(remainingTime);
-            },
-            300); // every 300ms
-      }
       break;
     case google.ima.AdEvent.Type.COMPLETE:
       // This event indicates the ad has finished - the video player
       // can perform appropriate UI actions, such as removing the timer for
       // remaining time detection.
-      console.log('FINISHED 1')
       gameScreen.style.display = 'block';
       mainAdContainer.style.display = 'none';
       videoContent.pause();
-      if (ad.isLinear()) {
-        console.log('FINISHED 2')
-        clearInterval(intervalTimer);
-      }
       break;
   }
 }

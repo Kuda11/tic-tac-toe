@@ -9,81 +9,30 @@ const DetectDrawText = document.querySelector("[data-user-result-message]");
 export const tickBoxes = document.querySelectorAll("[data-box]");
 const DisplayStartingText = document.getElementById("userStartGameMessage");
 const DisplayWinningText = document.getElementById("userResultMessage");
-let circleTurn = randomisePlayerTurn();
-const userStartGameBtn = document.getElementById("userStartGameBtn");
-const restartBtn = document.getElementById("restartBtn");
-const leaveGameBtn = document.getElementById("leaveGameBtn");
 const userTurnMessage = document.querySelector("[data-user-turn-message]");
 const leaveLink = document.querySelector(".leaveLink");
 const gameScreen = document.querySelector(".game-screen");
-const mainAdContainer = document.querySelector('.mainAdContainer');
 
-userStartGameBtn.addEventListener("click", userStartGame);
-restartBtn.addEventListener("click", restartGame);
+let circleTurn = randomisePlayerTurn();
 let waitTurn = false;
-
-function randomisePlayerTurn() {
-  return Math.random() > 0.5 ? true : false;
-}
-
-tickBoxes.forEach((box) => {
-  box.addEventListener("keydown", handleClick);
-});
-
-showWhoIsPlaying();
 
 decideStartingPlayer();
 
-function decideStartingPlayer() {
-  const randomNumber = Math.round(Math.random());
-  if (randomNumber === 0) {
-    runBotController({
-      displaySymbol,
-      botCharacterClass: !circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS,
-      handleClick,
-      randomBox: findRandomEmptyBox(),
-    });
-  }
-}
+showWhoIsPlaying();
 
-function userStartGame() {
-  gameScreen.style.display = "none";
-  DisplayStartingText.classList.add("display");
-}
+document.body.addEventListener('keydown', handleKeyDown);
 
-function restartGame() {
-    // Ads to run after game has finished e.g. you draw, win or lose
-    // Need to fix it, so it runs the ads properly
-    // Need to be able to hide everything else and cause the div with mainAdContainer to show
-    // Need to have it autoplay eventually as well
-
-//   requestAds();
-
-  DisplayWinningText.classList.remove("display");
-
-  waitTurn = false;
-  tickBoxes.forEach((box) => {
-    box.classList.remove(O_SYMBOL_CLASS);
-    box.classList.remove(X_SYMBOL_CLASS);
-  });
-  showWhoIsPlaying();
-  randomisePlayerTurn();
-}
-
-document.body.addEventListener('keydown', handleClick)
-
-function handleClick(e) {
+function handleKeyDown(e) {
   const welcomeScreen = document.querySelector('.user-start-message.display');
   const playAgainScreen = document.querySelector(".user-result-message.display");
 
   if(!welcomeScreen) {
     if(convertKeyToMovePosition(e.keyCode) === 'enter') {
       userStartGame();
-      requestAds();
       return;
     }
     if(convertKeyToMovePosition(e.keyCode) === 'backspace') {
-      window.location = leaveLink.href
+      window.location = leaveLink.href;
       return;
     }
   }
@@ -91,93 +40,95 @@ function handleClick(e) {
   if(playAgainScreen) {
     if(convertKeyToMovePosition(e.keyCode) === 'enter') {
       restartGame();
-      requestAds();
       return;
     }
     if(convertKeyToMovePosition(e.keyCode) === 'backspace') {
-      window.location = leaveLink.href
+      window.location = leaveLink.href;
       return;
     }
   }
   
   if (waitTurn) return;
-    const spotsMarked = {};
 
-    const movePosition = convertKeyToMovePosition(e.keyCode);
-    
-    const box = document.querySelector('.highlight')
-    const currentClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
+  const currentClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
+  const spotsMarked = {};
 
-    const spotToMoveTo = movePlayer(box, movePosition)
+  const movePosition = convertKeyToMovePosition(e.keyCode);
+  
+  const box = document.querySelector('.highlight')
 
-    if(!spotToMoveTo) return;
+  const spotToMoveTo = movePlayer(box, movePosition)
 
-    if (e.keyCode === 13) {
-      if(!(spotToMoveTo.classList.contains(O_SYMBOL_CLASS) || spotToMoveTo.classList.contains(X_SYMBOL_CLASS))) {
-        displaySymbol(spotToMoveTo, currentClass);
-      } else {
-        return;
-      }
+  if(!spotToMoveTo) return;
+
+  // Player
+  if (e.keyCode === 13) {
+    if(!(spotToMoveTo.classList.contains(O_SYMBOL_CLASS) || spotToMoveTo.classList.contains(X_SYMBOL_CLASS))) {
+      displaySymbol(spotToMoveTo, currentClass);
+      showWhoIsPlaying("Computer");
     } else {
       return;
     }
-  
-    // User
-  
-    showWhoIsPlaying("Computer");
-  
-    const playerSpotsMarked = [...tickBoxes].filter((tickBox) => {
-      return tickBox.classList.contains(currentClass);
+  } else {
+    return;
+  }
+
+  const playerSpotsMarked = [...tickBoxes].filter((tickBox) => {
+    return tickBox.classList.contains(currentClass);
+  });
+
+  spotsMarked["playerSpotsMarked"] = playerSpotsMarked;
+
+  if (checkWin(currentClass)) {
+    return endGame(false, {
+      user: "PLAYER",
     });
-  
-    spotsMarked["playerSpotsMarked"] = playerSpotsMarked;
-  
-    if (checkWin(currentClass)) {
-      return endGame(false, {
-        user: "PLAYER",
-      });
-    }
-  
-    if (isDraw()) {
-      return endGame(true);
-    } else {
-      // Bot
-      waitTurn = true;
-  
-      changePlayerTurn();
-      const botCharacterClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
-  
-      const botSpotsMarked = [...tickBoxes].filter((tickBox) => {
-        return tickBox.classList.contains(botCharacterClass);
-      });
-  
-      spotsMarked["botSpotsMarked"] = botSpotsMarked;
-  
-      const botGameInfo = {
-        spotsMarked,
-        currentClass,
-        displaySymbol,
-        botCharacterClass,
-        handleClick,
-        randomBox: findRandomEmptyBox(),
-      };
-  
-      const delayBot = setTimeout(() => {
-        runBotController(botGameInfo);
-        showWhoIsPlaying();
-        clearInterval(delayBot);
-  
-        if (checkWin(botCharacterClass)) {
-          return endGame(false, {
-            user: "COMPUTER",
-          });
-        } else {
-          waitTurn = false;
-        }
-      }, 1000);
-  
-      changePlayerTurn();
-    }
+  }
+
+  if (isDraw()) {
+    return endGame(true);
+  } else {
+    // Bot
+    waitTurn = true;
+
+    changePlayerTurn();
+    const botCharacterClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
+
+    const botSpotsMarked = [...tickBoxes].filter((tickBox) => {
+      return tickBox.classList.contains(botCharacterClass);
+    });
+
+    spotsMarked["botSpotsMarked"] = botSpotsMarked;
+
+    const botGameInfo = {
+      spotsMarked,
+      currentClass,
+      displaySymbol,
+      botCharacterClass,
+      handleKeyDown,
+      randomBox: findRandomEmptyBox(),
+    };
+
+    const delayBot = setTimeout(() => {
+      runBotController(botGameInfo);
+      showWhoIsPlaying();
+      clearInterval(delayBot);
+
+      if (checkWin(botCharacterClass)) {
+        return endGame(false, {
+          user: "COMPUTER",
+        });
+      } else {
+        waitTurn = false;
+      }
+    }, 1000);
+
+    changePlayerTurn();
+  }
+}
+
+function randomisePlayerTurn() {
+  return Math.random() > 0.5 ? true : false;
 }
 
 function displaySymbol(box, currentClass) {
@@ -250,24 +201,22 @@ function convertKeyToMovePosition(keyCode) {
 }
 
 function movePlayer(currentPosition, desiredMove) {
-  const currentPositionID = currentPosition.id;
-  let spaceToMoveBy = 0;
+  let newPosition = parseInt(currentPosition.id);
   switch(desiredMove) {
     case 'up':
-      spaceToMoveBy -= 3;
+      newPosition -= 3;
       break;
     case 'right':
-      spaceToMoveBy += 1;
+      newPosition += 1;
       break;
     case 'down':
-      spaceToMoveBy += 3;
+      newPosition += 3;
       break;
     case 'left':
-      spaceToMoveBy -= 1;
+      newPosition -= 1;
       break;
   }
 
-  const newPosition = parseInt(currentPositionID) + spaceToMoveBy;
   if(newPosition < 0 || newPosition > 8) {
     return true;
   } 
@@ -276,4 +225,45 @@ function movePlayer(currentPosition, desiredMove) {
   currentPosition.classList.remove('highlight');
   newSpot.classList.add('highlight');
   return newSpot
+}
+
+function decideStartingPlayer() {
+  const randomNumber = Math.round(Math.random());
+  if (randomNumber === 0) {
+    runBotController({
+      displaySymbol,
+      botCharacterClass: !circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS,
+      handleKeyDown,
+      randomBox: findRandomEmptyBox(),
+    });
+  }
+}
+
+function userStartGame() {
+  gameScreen.style.display = "none";
+  DisplayStartingText.classList.add("display");
+  requestAds();
+}
+
+function restartGame() {
+  DisplayWinningText.classList.remove("display");
+
+  waitTurn = false;
+  tickBoxes.forEach((box) => {
+    box.classList.remove(O_SYMBOL_CLASS);
+    box.classList.remove(X_SYMBOL_CLASS);
+  });
+  showWhoIsPlaying();
+  randomisePlayerTurn();
+}
+
+function playOrEscapeGame(play, keyCode) {
+  if(convertKeyToMovePosition(keyCode) === 'enter') {
+    play();
+    return;
+  }
+  if(convertKeyToMovePosition(keyCode) === 'backspace') {
+    window.location = leaveLink.href;
+    return;
+  }
 }

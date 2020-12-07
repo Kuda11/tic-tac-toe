@@ -4,7 +4,7 @@ const state = {
   player: "",
   displayCounterComputerSymbol: undefined,
   botCharacterClass: "",
-  handleClick: undefined,
+  handleKeyDown: undefined,
 };
 
 export function botController({
@@ -15,13 +15,13 @@ export function botController({
   currentClass,
   displaySymbol,
   botCharacterClass,
-  handleClick,
+  handleKeyDown,
   randomBox,
 } = {}) {
   state.player = currentClass;
   state.botCharacterClass = botCharacterClass;
   state.displayCounterComputerSymbol = displaySymbol;
-  state.handleClick = handleClick;
+  state.handleKeyDown = handleKeyDown;
 
   if (playToWin(spotsMarked)) {
     return;
@@ -61,7 +61,7 @@ function decideHowToPlay(spotsMarked) {
 
 function playRandom(box) {
   state.displayCounterComputerSymbol(box, state.botCharacterClass);
-  box.removeEventListener("click", state.handleClick);
+  box.removeEventListener("click", state.handleKeyDown);
 }
 
 function checkCombination(playerSpots) {
@@ -79,7 +79,7 @@ function checkCombination(playerSpots) {
 
     if (emptyPosition >= 0 || emptyPosition < 9) {
       const emptyPositionOnGameBoard = document.getElementById(emptyPosition);
-      emptyPositionOnGameBoard.removeEventListener("click", state.handleClick);
+      emptyPositionOnGameBoard.removeEventListener("click", state.handleKeyDown);
       state.displayCounterComputerSymbol(
         emptyPositionOnGameBoard,
         state.botCharacterClass
