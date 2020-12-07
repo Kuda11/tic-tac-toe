@@ -2,11 +2,11 @@ import { checkWin } from "./game-functionality.js";
 import { botController } from "./computer-brain.js";
 import { requestAds } from "./ads.js";
 
+export const tickBoxes = document.querySelectorAll("[data-box]");
 const X_SYMBOL_CLASS = "x";
 const O_SYMBOL_CLASS = "circle";
 const DetectWinningText = document.querySelector("[data-user-result-message]");
 const DetectDrawText = document.querySelector("[data-user-result-message]");
-export const tickBoxes = document.querySelectorAll("[data-box]");
 const DisplayStartingText = document.getElementById("userStartGameMessage");
 const DisplayWinningText = document.getElementById("userResultMessage");
 const userTurnMessage = document.querySelector("[data-user-turn-message]");
@@ -16,10 +16,6 @@ const gameScreen = document.querySelector(".game-screen");
 let circleTurn = randomisePlayerTurn();
 let waitTurn = false;
 
-decideStartingPlayer();
-
-showWhoIsPlaying();
-
 document.body.addEventListener('keydown', handleKeyDown);
 
 function handleKeyDown(e) {
@@ -27,25 +23,13 @@ function handleKeyDown(e) {
   const playAgainScreen = document.querySelector(".user-result-message.display");
 
   if(!welcomeScreen) {
-    if(convertKeyToMovePosition(e.keyCode) === 'enter') {
-      userStartGame();
-      return;
-    }
-    if(convertKeyToMovePosition(e.keyCode) === 'backspace') {
-      window.location = leaveLink.href;
-      return;
-    }
+    decideStartingPlayer();
+    showWhoIsPlaying();
+    return playOrEscape(userStartGame, e.keyCode)
   }
 
   if(playAgainScreen) {
-    if(convertKeyToMovePosition(e.keyCode) === 'enter') {
-      restartGame();
-      return;
-    }
-    if(convertKeyToMovePosition(e.keyCode) === 'backspace') {
-      window.location = leaveLink.href;
-      return;
-    }
+    return playOrEscape(restartGame, e.keyCode)
   }
   
   if (waitTurn) return;
@@ -62,22 +46,12 @@ function handleKeyDown(e) {
   if(!spotToMoveTo) return;
 
   // Player
-  if (e.keyCode === 13) {
-    if(!(spotToMoveTo.classList.contains(O_SYMBOL_CLASS) || spotToMoveTo.classList.contains(X_SYMBOL_CLASS))) {
-      displaySymbol(spotToMoveTo, currentClass);
-      showWhoIsPlaying("Computer");
-    } else {
-      return;
-    }
+  if (e.keyCode === 13 && !(spotToMoveTo.classList.contains(O_SYMBOL_CLASS) || spotToMoveTo.classList.contains(X_SYMBOL_CLASS))) {
+    displaySymbol(spotToMoveTo, currentClass);
+    showWhoIsPlaying("Computer");
   } else {
     return;
   }
-
-  const playerSpotsMarked = [...tickBoxes].filter((tickBox) => {
-    return tickBox.classList.contains(currentClass);
-  });
-
-  spotsMarked["playerSpotsMarked"] = playerSpotsMarked;
 
   if (checkWin(currentClass)) {
     return endGame(false, {
@@ -87,44 +61,53 @@ function handleKeyDown(e) {
 
   if (isDraw()) {
     return endGame(true);
-  } else {
+  } 
     // Bot
-    waitTurn = true;
+  waitTurn = true;
 
-    changePlayerTurn();
-    const botCharacterClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
+  // Invert boolean value of circle turn
+  changePlayerTurn();
 
-    const botSpotsMarked = [...tickBoxes].filter((tickBox) => {
-      return tickBox.classList.contains(botCharacterClass);
-    });
+  const botCharacterClass = circleTurn ? O_SYMBOL_CLASS : X_SYMBOL_CLASS;
 
-    spotsMarked["botSpotsMarked"] = botSpotsMarked;
+  // Record player's positions on game board
+  const playerSpotsMarked = [...tickBoxes].filter((tickBox) => {
+    return tickBox.classList.contains(currentClass);
+  });
 
-    const botGameInfo = {
-      spotsMarked,
-      currentClass,
-      displaySymbol,
-      botCharacterClass,
-      handleKeyDown,
-      randomBox: findRandomEmptyBox(),
-    };
+  spotsMarked["playerSpotsMarked"] = playerSpotsMarked;
 
-    const delayBot = setTimeout(() => {
-      runBotController(botGameInfo);
-      showWhoIsPlaying();
-      clearInterval(delayBot);
+  // Record computer's positions on game board
+  const botSpotsMarked = [...tickBoxes].filter((tickBox) => {
+    return tickBox.classList.contains(botCharacterClass);
+  });
 
-      if (checkWin(botCharacterClass)) {
-        return endGame(false, {
-          user: "COMPUTER",
-        });
-      } else {
-        waitTurn = false;
-      }
-    }, 1000);
+  spotsMarked["botSpotsMarked"] = botSpotsMarked;
 
-    changePlayerTurn();
-  }
+  const botGameInfo = {
+    spotsMarked,
+    currentClass,
+    displaySymbol,
+    botCharacterClass,
+    handleKeyDown,
+    randomBox: findRandomEmptyBox(),
+  };
+
+  const delayBot = setTimeout(() => {
+    runBotController(botGameInfo);
+    showWhoIsPlaying();
+    clearInterval(delayBot);
+
+    if (checkWin(botCharacterClass)) {
+      return endGame(false, {
+        user: "COMPUTER",
+      });
+    } else {
+      waitTurn = false;
+    }
+  }, 1000);
+
+  changePlayerTurn();
 }
 
 function randomisePlayerTurn() {
@@ -217,14 +200,13 @@ function movePlayer(currentPosition, desiredMove) {
       break;
   }
 
-  if(newPosition < 0 || newPosition > 8) {
-    return true;
-  } 
   const newSpot = document.getElementById(newPosition);
 
-  currentPosition.classList.remove('highlight');
-  newSpot.classList.add('highlight');
-  return newSpot
+  if(newSpot) {
+    currentPosition.classList.remove('highlight');
+    newSpot.classList.add('highlight');
+    return newSpot
+  }
 }
 
 function decideStartingPlayer() {
@@ -257,7 +239,7 @@ function restartGame() {
   randomisePlayerTurn();
 }
 
-function playOrEscapeGame(play, keyCode) {
+function playOrEscape(play, keyCode) {
   if(convertKeyToMovePosition(keyCode) === 'enter') {
     play();
     return;
