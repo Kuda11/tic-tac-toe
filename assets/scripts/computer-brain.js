@@ -10,15 +10,14 @@ const state = {
 export function botController({
   spotsMarked = {
     playerSpotsMarked: [],
-    botSpotsMarked: []
+    botSpotsMarked: [],
   },
   currentClass,
   displaySymbol,
   botCharacterClass,
   handleClick,
-  randomBox
-  } = {}
-) {
+  randomBox,
+} = {}) {
   state.player = currentClass;
   state.botCharacterClass = botCharacterClass;
   state.displayCounterComputerSymbol = displaySymbol;
@@ -42,19 +41,15 @@ function playToWin({ botSpotsMarked }) {
 }
 
 function decideHowToPlay(spotsMarked) {
-  // Security check. Tells us if a combination has been found
   if (spotsMarked.length >= 2) {
     let combinationFound = false;
-    // Loop through each position and find each possible permutation for a combination
-    // E.g. for an array of [1,3,5]
-    // Check for combination of [1,3] [1,5] [3,5]
+
     for (let i = 0, length = spotsMarked.length; i < length; i++) {
       for (let j = i; j < length - 1; j++) {
-        // If a combination has been found, break out the loop
         if (combinationFound) break;
+
         const combination = [spotsMarked[i], spotsMarked[j + 1]];
         if (checkCombination(combination)) {
-          // Lets us know a combination has been found
           combinationFound = true;
         }
       }
@@ -95,7 +90,6 @@ function checkCombination(playerSpots) {
 }
 
 function checkEmptyPositions(playerWinnerCombo) {
-  // Box has not been filled yet
   return playerWinnerCombo.some(
     (singlePosition) =>
       document.getElementById(singlePosition).className === "tick-box"
